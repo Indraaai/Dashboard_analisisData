@@ -63,6 +63,74 @@ try:
     )
     
     # ===========================
+    # FITUR INTERAKTIF - FILTERS
+    # ===========================
+    st.sidebar.markdown("---")
+    st.sidebar.title("🔍 Filter Data Interaktif")
+    
+    # Filter Date Range
+    st.sidebar.subheader("📅 Filter Rentang Tanggal")
+    min_date = df['order_purchase_timestamp'].min().date()
+    max_date = df['order_purchase_timestamp'].max().date()
+    
+    date_range = st.sidebar.date_input(
+        "Pilih Rentang Tanggal:",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date,
+        help="Filter data berdasarkan tanggal pembelian"
+    )
+    
+    # Filter Kategori Produk
+    st.sidebar.subheader("📦 Filter Kategori Produk")
+    all_categories = ['Semua Kategori'] + sorted(df['product_category_name_english'].dropna().unique().tolist())
+    selected_category = st.sidebar.selectbox(
+        "Pilih Kategori:",
+        options=all_categories,
+        help="Filter data berdasarkan kategori produk"
+    )
+    
+    # Filter State/Provinsi
+    st.sidebar.subheader("🗺️ Filter Provinsi")
+    all_states = ['Semua Provinsi'] + sorted(df['customer_state'].dropna().unique().tolist())
+    selected_state = st.sidebar.selectbox(
+        "Pilih Provinsi:",
+        options=all_states,
+        help="Filter data berdasarkan provinsi pelanggan"
+    )
+    
+    # Apply Filters
+    df_filtered = df.copy()
+    
+    # Apply date filter
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+        df_filtered = df_filtered[
+            (df_filtered['order_purchase_timestamp'].dt.date >= start_date) & 
+            (df_filtered['order_purchase_timestamp'].dt.date <= end_date)
+        ]
+    
+    # Apply category filter
+    if selected_category != 'Semua Kategori':
+        df_filtered = df_filtered[df_filtered['product_category_name_english'] == selected_category]
+    
+    # Apply state filter
+    if selected_state != 'Semua Provinsi':
+        df_filtered = df_filtered[df_filtered['customer_state'] == selected_state]
+    
+    # Display filter info
+    if len(df_filtered) < len(df):
+        st.sidebar.markdown("---")
+        st.sidebar.success(f"✅ Filter Aktif: {len(df_filtered):,} dari {len(df):,} data")
+        
+        # Reset filter button
+        if st.sidebar.button("🔄 Reset Semua Filter"):
+            st.rerun()
+    
+    # Use filtered data for all visualizations
+    df = df_filtered
+    
+    # ===========================
     # HALAMAN OVERVIEW
     # ===========================
     if menu == "🏠 Overview":
