@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ```bash
 cd dashboard
-streamlit run dashboard.py
+streamlit run app.py
 ```
 
 Dashboard akan terbuka di browser pada `http://localhost:8501`
@@ -24,7 +24,7 @@ Dashboard akan terbuka di browser pada `http://localhost:8501`
 ```
 .
 ├── dashboard/
-│   ├── dashboard.py          # File utama dashboard
+│   ├── app.py          # File utama dashboard
 │   └── main_data.csv         # Data yang sudah dibersihkan
 ├── Proyek_Analisis_Data.ipynb  # Notebook analisis
 └── requirements.txt          # Library dependencies
