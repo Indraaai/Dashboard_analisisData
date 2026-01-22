@@ -34,17 +34,36 @@ st.markdown("""
 @st.cache_data
 def load_data():
     try:
-        # Gunakan path relatif
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Coba beberapa path untuk support local dan deployment
+        possible_paths = [
+            os.path.dirname(os.path.abspath(__file__)),  # Same directory as app.py
+            os.getcwd(),  # Current working directory
+            '.',  # Relative current directory
+        ]
+        
+        csv_files = [
+            'orders_df.csv', 'order_items_df.csv', 'order_payments_df.csv',
+            'products_df.csv', 'category_names_df.csv', 'reviews_df.csv', 'customers_df.csv'
+        ]
+        
+        # Find the correct path
+        data_path = None
+        for path in possible_paths:
+            if os.path.exists(os.path.join(path, 'orders_df.csv')):
+                data_path = path
+                break
+        
+        if data_path is None:
+            raise FileNotFoundError("CSV files tidak ditemukan. Pastikan file CSV ada di folder yang sama dengan app.py")
         
         # Load semua file CSV
-        orders_df = pd.read_csv(os.path.join(script_dir, 'orders_df.csv'))
-        order_items_df = pd.read_csv(os.path.join(script_dir, 'order_items_df.csv'))
-        order_payments_df = pd.read_csv(os.path.join(script_dir, 'order_payments_df.csv'))
-        products_df = pd.read_csv(os.path.join(script_dir, 'products_df.csv'))
-        category_names_df = pd.read_csv(os.path.join(script_dir, 'category_names_df.csv'))
-        reviews_df = pd.read_csv(os.path.join(script_dir, 'reviews_df.csv'))
-        customers_df = pd.read_csv(os.path.join(script_dir, 'customers_df.csv'))
+        orders_df = pd.read_csv(os.path.join(data_path, 'orders_df.csv'))
+        order_items_df = pd.read_csv(os.path.join(data_path, 'order_items_df.csv'))
+        order_payments_df = pd.read_csv(os.path.join(data_path, 'order_payments_df.csv'))
+        products_df = pd.read_csv(os.path.join(data_path, 'products_df.csv'))
+        category_names_df = pd.read_csv(os.path.join(data_path, 'category_names_df.csv'))
+        reviews_df = pd.read_csv(os.path.join(data_path, 'reviews_df.csv'))
+        customers_df = pd.read_csv(os.path.join(data_path, 'customers_df.csv'))
         
         # Convert datetime columns untuk orders_df
         datetime_cols = ['order_purchase_timestamp', 'order_approved_at', 
@@ -56,7 +75,9 @@ def load_data():
         
         return orders_df, order_items_df, order_payments_df, products_df, category_names_df, reviews_df, customers_df
     except Exception as e:
-        st.error(f"Error loading data: {str(e)}")
+        st.error(f"❌ Error loading data: {str(e)}")
+        st.info(f"📂 Current working directory: {os.getcwd()}")
+        st.info(f"📂 Script directory: {os.path.dirname(os.path.abspath(__file__))}")
         return None, None, None, None, None, None, None
 
 # Load data
